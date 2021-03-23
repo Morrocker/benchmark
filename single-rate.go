@@ -26,9 +26,9 @@ func NewSRate(n int) *SRate {
 
 func (s *SRate) MeasureStart(x int64) func(int64) {
 	now := time.Now()
-	log.Benchln("Start: %d", x)
+	log.Bench("Start: %d", x)
 	return func(m int64) {
-		log.Benchln("End: %d", x)
+		log.Bench("End: %d", x)
 		diff := int64(time.Since(now).Nanoseconds())
 		diff2 := m - x
 		rate := diff2 * 1000000000 / diff
@@ -54,7 +54,7 @@ func (s *SRate) Reset() {
 func (s *SRate) add(r int64) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
-	log.Benchln("Adding r:%d", r)
+	log.Bench("Adding r:%d", r)
 	if s.list.Len() < s.sampleSize || s.sampleSize == 0 {
 		s.list.PushFront(r)
 		s.total = s.total + r
