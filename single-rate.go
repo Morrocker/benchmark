@@ -28,7 +28,7 @@ func (s *SRate) MeasureStart(x int64) func(int64) {
 	now := time.Now()
 	log.Bench("Start: %d", x)
 	return func(m int64) {
-		log.Bench("End: %d", x)
+		log.Bench("End: %d", m)
 		diff := int64(time.Since(now).Nanoseconds())
 		diff2 := m - x
 		rate := diff2 * 1000000000 / diff
