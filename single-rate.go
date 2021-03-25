@@ -36,7 +36,7 @@ func (s *SRate) MeasureStart(x int64) func(int64) {
 		diff2 := m - x
 		rate := diff2 * 1000000000 / diff
 		s.add(rate)
-		Logger.Bench("Start: %d | End: %d | Rate: %d | Avg: %d | RateTot: %d / SampleSize: %d", x, m, rate, s.AvgRate(), s.list.Len())
+		Logger.Bench("Start: %d | End: %d | Rate: %d | Avg: %d | RateTot: %d / SampleSize: %d", x, m, rate, s.AvgRate(), s.total, s.list.Len())
 	}
 }
 
