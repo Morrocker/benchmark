@@ -4,6 +4,8 @@ import (
 	"container/list"
 	"sync"
 	"time"
+
+	"github.com/morrocker/log"
 )
 
 type SRate struct {
@@ -12,6 +14,13 @@ type SRate struct {
 	list       *list.List
 
 	lock sync.Mutex
+}
+
+var Logger *log.Logger = log.New()
+
+func init() {
+	Logger.OutputFile("tracker.debug.log")
+	Logger.StartWriter()
 }
 
 func NewSRate(n int) *SRate {
@@ -29,6 +38,7 @@ func (s *SRate) MeasureStart(x int64) func(int64) {
 		diff2 := m - x
 		rate := diff2 * 1000000000 / diff
 		s.add(rate)
+		Logger.Bench("Start: %d | End: %d | Rate: %d | Avg: %d | RateTot: %d / SampleSize: %d", x, m, rate, s.AvgRate(), s.list.Len())
 	}
 }
 
