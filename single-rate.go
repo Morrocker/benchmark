@@ -18,17 +18,14 @@ type SRate struct {
 
 var Logger *log.Logger = log.New()
 
-// func init() {
-// 	Logger.OutputFile("tracker.debug.log")
-// 	Logger.StartWriter()
-// 	Logger.SetScope(true, true, true)
-// }
-
 func NewSRate(n int) *SRate {
 	newSRate := &SRate{
 		sampleSize: n,
 		list:       list.New(),
 	}
+	Logger.OutputFile("tracker.debug.log")
+	Logger.SetScope(true, true, true)
+	Logger.StartWriter()
 	return newSRate
 }
 
