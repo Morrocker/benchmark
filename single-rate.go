@@ -18,10 +18,11 @@ type SRate struct {
 
 var Logger *log.Logger = log.New()
 
-func init() {
-	Logger.OutputFile("tracker.debug.log")
-	Logger.StartWriter()
-}
+// func init() {
+// 	Logger.OutputFile("tracker.debug.log")
+// 	Logger.StartWriter()
+// 	Logger.SetScope(true, true, true)
+// }
 
 func NewSRate(n int) *SRate {
 	newSRate := &SRate{
