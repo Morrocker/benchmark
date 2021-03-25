@@ -61,3 +61,7 @@ func (s *SRate) add(r int64) {
 		s.list.Remove(e)
 	}
 }
+
+func (s *SRate) RawValues() (int64, int) {
+	return s.total, s.list.Len()
+}
