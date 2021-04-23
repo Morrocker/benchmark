@@ -23,9 +23,6 @@ func NewSRate(n int) *SRate {
 		sampleSize: n,
 		list:       list.New(),
 	}
-	Logger.OutputFile("tracker.debug.log")
-	Logger.SetScope(true, true, true)
-	Logger.StartWriter()
 	return newSRate
 }
 
