@@ -4,11 +4,16 @@ import (
 	"container/list"
 	"sync"
 	"time"
-
-	"github.com/morrocker/log"
 )
 
-type SRate struct {
+type SingleRate interface {
+	MeasureStart(int64) func(int64) // returns MeasureEnd function
+	AvgRate() int64
+	Reset()
+	Values() (sampleSize int, total int64, listLen int)
+}
+
+type singleRate struct {
 	sampleSize int
 	total      int64
 	list       *list.List
@@ -16,28 +21,28 @@ type SRate struct {
 	lock sync.Mutex
 }
 
-var Logger *log.Logger = log.New()
-
-func NewSRate(n int) *SRate {
-	newSRate := &SRate{
+// NewSingleRate returns a new SingleRate object with the given sample size
+func NewSingleRate(n int) SingleRate {
+	newSingleRate := &singleRate{
 		sampleSize: n,
 		list:       list.New(),
 	}
-	return newSRate
+	return newSingleRate
 }
 
-func (s *SRate) MeasureStart(x int64) func(int64) {
+// MeasureStart starts a measurement and returns a function to end and record the measurement
+func (s *singleRate) MeasureStart(x int64) func(int64) {
 	now := time.Now()
 	return func(m int64) {
 		diff := int64(time.Since(now).Nanoseconds())
 		diff2 := m - x
 		rate := diff2 * 1000000000 / diff
 		s.add(rate)
-		// Logger.Bench("Start: %d | End: %d | Rate: %d | Avg: %d | RateTot: %d / SampleSize: %d", x, m, rate, s.AvgRate(), s.total, s.list.Len())
 	}
 }
 
-func (s *SRate) AvgRate() int64 {
+// AvgRate returns the average rate from measurements taken
+func (s *singleRate) AvgRate() int64 {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	if s.list.Len() == 0 {
@@ -46,13 +51,20 @@ func (s *SRate) AvgRate() int64 {
 	return s.total / int64(s.list.Len())
 }
 
-func (s *SRate) Reset() {
+// Reset sets all measurements values to their initial value
+func (s *singleRate) Reset() {
 	s.lock.Lock()
 	defer s.lock.Unlock()
-
+	s.total = 0
+	s.list = list.New()
 }
 
-func (s *SRate) add(r int64) {
+// Values returns the SingleRate relevant values
+func (s *singleRate) Values() (sampleSize int, total int64, listLen int) {
+	return s.sampleSize, s.total, s.list.Len()
+}
+
+func (s *singleRate) add(r int64) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	if s.list.Len() < s.sampleSize || s.sampleSize == 0 {
@@ -65,8 +77,4 @@ func (s *SRate) add(r int64) {
 		s.total = s.total + r - val
 		s.list.Remove(e)
 	}
-}
-
-func (s *SRate) RawValues() (int64, int) {
-	return s.total, s.list.Len()
 }
