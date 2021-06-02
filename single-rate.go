@@ -11,6 +11,7 @@ type SingleRate interface {
 	AvgRate() int64
 	Reset()
 	Values() (sampleSize int, total int64, listLen int)
+	SampleSize(...int) int
 }
 
 type singleRate struct {
@@ -62,6 +63,17 @@ func (s *singleRate) Reset() {
 // Values returns the SingleRate relevant values
 func (s *singleRate) Values() (sampleSize int, total int64, listLen int) {
 	return s.sampleSize, s.total, s.list.Len()
+}
+
+// SampleSize sets the sample size or returns it no value is given
+func (s *singleRate) SampleSize(n ...int) int {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	if len(n) != 0 {
+		s.sampleSize = n[0]
+		return s.sampleSize
+	}
+	return s.sampleSize
 }
 
 func (s *singleRate) add(r int64) {
