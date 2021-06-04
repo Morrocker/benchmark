@@ -10,12 +10,12 @@ type SingleRate interface {
 	MeasureStart(int64) func(int64) // returns MeasureEnd function
 	AvgRate() int64
 	Reset()
-	Values() (sampleSize int, total int64, listLen int)
-	SampleSize(...int) int
+	Values() (sampleSize uint, total int64, listLen int)
+	SampleSize(...uint) uint
 }
 
 type singleRate struct {
-	sampleSize int
+	sampleSize uint
 	total      int64
 	list       *list.List
 
@@ -23,7 +23,7 @@ type singleRate struct {
 }
 
 // NewSingleRate returns a new SingleRate object with the given sample size
-func NewSingleRate(n int) SingleRate {
+func NewSingleRate(n uint) SingleRate {
 	newSingleRate := &singleRate{
 		sampleSize: n,
 		list:       list.New(),
@@ -61,12 +61,12 @@ func (s *singleRate) Reset() {
 }
 
 // Values returns the SingleRate relevant values
-func (s *singleRate) Values() (sampleSize int, total int64, listLen int) {
+func (s *singleRate) Values() (sampleSize uint, total int64, listLen int) {
 	return s.sampleSize, s.total, s.list.Len()
 }
 
 // SampleSize sets the sample size or returns it no value is given
-func (s *singleRate) SampleSize(n ...int) int {
+func (s *singleRate) SampleSize(n ...uint) uint {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	if len(n) != 0 {
@@ -79,7 +79,7 @@ func (s *singleRate) SampleSize(n ...int) int {
 func (s *singleRate) add(r int64) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
-	if s.list.Len() < s.sampleSize || s.sampleSize == 0 {
+	if s.list.Len() < int(s.sampleSize) || s.sampleSize == 0 {
 		s.list.PushFront(r)
 		s.total = s.total + r
 	} else {
