@@ -37,7 +37,7 @@ func (s *singleRate) MeasureStart(x int64) func(int64) {
 	return func(m int64) {
 		diff := int64(time.Since(now).Seconds())
 		diff2 := m - x
-		rate := diff2 * 1000000000 / diff
+		rate := diff2 / diff
 		s.add(rate)
 	}
 }
