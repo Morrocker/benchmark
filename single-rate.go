@@ -35,7 +35,7 @@ func NewSingleRate(n uint) SingleRate {
 func (s *singleRate) MeasureStart(x int64) func(int64) {
 	now := time.Now()
 	return func(m int64) {
-		diff := int64(time.Since(now).Nanoseconds())
+		diff := int64(time.Since(now).Seconds())
 		diff2 := m - x
 		rate := diff2 * 1000000000 / diff
 		s.add(rate)
